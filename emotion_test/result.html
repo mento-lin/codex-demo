@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>结果 - 情绪安稳度测评</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <main id="report-root" class="report-stack">
+    <div class="card score-card full-width">
+      <div class="score-header">
+        <div>
+          <h2 class="section-title">情绪安稳指数</h2>
+          <div class="score-badge"><span id="stable-index">0</span><small>/ 100</small></div>
+          <div class="type-pill" id="emotion-type">类型</div>
+          <p class="meta-line" id="short-summary"></p>
+        </div>
+        <div class="save-area">
+          <button id="save-report-btn" class="btn-primary">保存完整报告为图片</button>
+          <p class="meta-line">保存后可留存给自己或与信任的人分享。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card radar-card full-width">
+      <h3 class="section-title">情绪四维雷达</h3>
+      <canvas id="emotion-radar" height="360"></canvas>
+    </div>
+
+    <div class="card full-width">
+      <h3 class="section-title">① 你的情绪画像</h3>
+      <div id="profile-html"></div>
+    </div>
+
+    <div class="card full-width">
+      <h3 class="section-title">② 你最近可能出现的小信号</h3>
+      <ul id="small-signals" class="list-soft"></ul>
+    </div>
+
+    <div class="card full-width">
+      <h3 class="section-title">③ 你的隐藏优点</h3>
+      <div id="hidden-strengths"></div>
+    </div>
+
+    <div class="card full-width">
+      <h3 class="section-title">④ 给现在的你 3 个温柔建议</h3>
+      <ul id="gentle-suggestions" class="list-soft"></ul>
+    </div>
+
+    <div class="card full-width">
+      <h3 class="section-title">⑤ 属于你的治愈金句</h3>
+      <div id="healing-quote-block">
+        <p id="quote-line-1"></p>
+        <p id="quote-line-2"></p>
+        <p id="quote-line-3"></p>
+      </div>
+    </div>
+
+    <div class="disclaimer full-width">
+      <h4 class="disclaimer-title">免责声明</h4>
+      <p>本测评仅用于轻量情绪体验参考，不构成任何专业心理评估、诊断或治疗建议。</p>
+      <p>如你正在经历持续性的情绪困扰、严重压力或明显影响日常生活的情绪波动，请及时寻求专业心理咨询师或医生的帮助。</p>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>答题 - 情绪安稳度测评</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h2 class="section-title">测评进度</h2>
+      <div>
+        <p id="question-number" class="meta-line">第 1 题 / 共 30 题</p>
+        <p id="completion-text" class="meta-line">已完成：0 / 30 | 选择后自动跳到下一题</p>
+        <div class="progress-wrapper">
+          <div class="progress-bar-bg">
+            <div id="progress-bar"></div>
+          </div>
+        </div>
+      <div class="question-box">
+          <div id="question-text">题目加载中…</div>
+          <div id="options" class="options"></div>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button id="prev-question-btn" class="btn-secondary">上一题</button>
+      </div>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
