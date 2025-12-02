@@ -1,5 +1,5 @@
-[functions]
-directory = "netlify/functions"
-
 [build]
-publish = "emotion_test"
+  base = "emotion_test"
+  publish = "emotion_test"
+  functions = "emotion_test/netlify/functions"
+
