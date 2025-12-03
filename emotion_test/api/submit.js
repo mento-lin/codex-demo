@@ -1,31 +1,24 @@
-import Feishu from '@larksuiteoapi/node-sdk';
+const axios = require("axios");
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'POST required' });
+module.exports = async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { answers, score } = req.body;
-
-  const client = new Feishu.Client({
-    appId: process.env.FEISHU_APP_ID,
-    appSecret: process.env.FEISHU_APP_SECRET,
-  });
+  const { score, uid } = req.body;
 
   try {
-    await client.bitable.record.create({
-      app_token: process.env.FEISHU_BASE_ID,
-      table_id: process.env.RESULTS_TABLE_ID,
-      fields: {
-        score,
-        answers: JSON.stringify(answers),
-        time: new Date().toLocaleString('zh-CN'),
+    await axios.post(
+      `https://open.feishu.cn/open-apis/bitable/v1/apps/${process.env.FEISHU_BASE_ID}/tables/${process.env.RESULTS_TABLE_ID}/records`,
+      {
+        fields: { uid, score }
       },
-    });
+      { headers: { Authorization: `Bearer ${process.env.FEISHU_APP_SECRET}` } }
+    );
 
-    return res.json({ success: true });
+    res.json({ success: true });
   } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ success: false, message: e.message });
   }
-}
+};
+
