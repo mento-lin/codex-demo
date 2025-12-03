@@ -1,5 +1,4 @@
 [build]
-  base = "emotion_test"
-  publish = "emotion_test"
+  base = ""                        # 根目录为空，表示项目根目录
+  publish = "emotion_test"         # 静态页面所在目录
   functions = "emotion_test/netlify/functions"
-
