@@ -1,51 +1,48 @@
-import Feishu from '@larksuiteoapi/node-sdk';
+const axios = require("axios");
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'POST required' });
+module.exports = async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { code } = req.body;
+  const { code, order_id } = req.body;
 
   if (!code) {
-    return res.status(400).json({ error: 'Missing code' });
+    return res.status(400).json({ success: false, message: "兑换码不能为空" });
   }
-
-  const client = new Feishu.Client({
-    appId: process.env.FEISHU_APP_ID,
-    appSecret: process.env.FEISHU_APP_SECRET,
-  });
 
   try {
-    // 从飞书表格查询兑换码
-    const result = await client.bitable.record.list({
-      app_token: process.env.FEISHU_BASE_ID,
-      table_id: process.env.REDEEM_TABLE_ID,
-    });
+    // 搜记录
+    const searchResp = await axios.get(
+      `https://open.feishu.cn/open-apis/bitable/v1/apps/${process.env.FEISHU_BASE_ID}/tables/${process.env.REDEEM_TABLE_ID}/records?filter=CurrentValue.code="${code}"`,
+      { headers: { Authorization: `Bearer ${process.env.FEISHU_APP_SECRET}` } }
+    );
 
-    const records = result?.data?.items ?? [];
-
-    const found = records.find((r) => r.fields.code === code);
-
-    if (!found) {
-      return res.status(400).json({ error: '兑换码不存在或已被使用' });
+    const record = searchResp.data?.data?.items?.[0];
+    if (!record) {
+      return res.json({ success: false, message: "兑换码不存在" });
     }
 
-    if (found.fields.used === '1') {
-      return res.status(400).json({ error: '兑换码已被使用' });
+    if (record.fields.status !== "未使用") {
+      return res.json({ success: false, message: "兑换码已被使用" });
     }
 
-    // 标记为使用
-    await client.bitable.record.update({
-      app_token: process.env.FEISHU_BASE_ID,
-      table_id: process.env.REDEEM_TABLE_ID,
-      record_id: found.record_id,
-      fields: { used: '1' },
-    });
+    // 更新记录
+    await axios.patch(
+      `https://open.feishu.cn/open-apis/bitable/v1/apps/${process.env.FEISHU_BASE_ID}/tables/${process.env.REDEEM_TABLE_ID}/records/${record.record_id}`,
+      {
+        fields: {
+          status: "已使用",
+          order_id,
+          used_at: new Date().toISOString()
+        }
+      },
+      { headers: { Authorization: `Bearer ${process.env.FEISHU_APP_SECRET}` } }
+    );
 
-    return res.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Server error' });
+    return res.json({ success: true, message: "兑换成功，可以开始测试" });
+  } catch (e) {
+    return res.status(500).json({ success: false, message: e.message });
   }
-}
+};
+
