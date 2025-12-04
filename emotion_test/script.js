@@ -578,276 +578,397 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
-// 公共前端逻辑
-const QUESTIONS = [
-  "最近 1 周，你能保持平稳的心态面对变化。",
-  "遇到不顺时，你能在短时间内缓和情绪。",
-  "你会主动观察并记录自己的情绪起伏。",
-  "感到紧张时，你能找到让自己放松的办法。",
-  "压力来临时，你仍能按计划完成任务。",
-  "你会向信任的人寻求支持。",
-  "你能接受自己偶尔的情绪低落。",
-  "焦虑时，你会使用深呼吸或冥想。",
-  "你能把注意力转向可执行的步骤。",
-  "沟通时，你能温和表达需求。",
-  "情绪激动时，你会先冷静再行动。",
-  "你相信不安是暂时的。",
-  "你能清晰描述当下的情绪。",
-  "面对他人激动，你能不被完全带跑。",
-  "你愿意为自己的情绪反应负责。",
-  "你会为情绪设定健康的界限。",
-  "你保持相对稳定的作息。",
-  "突发事件时，你会先评估再行动。",
-  "你能分辨情绪背后的需求。",
-  "不顺利时，你仍能看到成长。",
-  "你愿意适度分享脆弱。",
-  "忙碌时，你会安排休息。",
-  "你会反思触发点并调整相处方式。",
-  "情绪失控后，你会修复关系。",
-  "压力下，你能保持理性决策。",
-  "你会用运动、音乐等方式调节。",
-  "你理解情绪是信号，而非敌人。",
-  "面对批评，你会分辨事实与情绪。",
-  "需要时，你会寻求专业支持。",
-  "你相信自己能够逐步稳定情绪。"
+// 通用数据
+const optionLabels = ["非常不符合", "不太符合", "一般", "比较符合", "非常符合"];
+const questionBank = [
+  { text: "过去一周，你是否常感到情绪像过山车般忽高忽低？", dimension: "emotion_fluctuation" },
+  { text: "面对紧急任务时，你能否快速稳定情绪并投入行动？", dimension: "stress_tolerance" },
+  { text: "当身边的人语气变化时，你是否会立刻揣测对方想法？", dimension: "interpersonal_sensitivity" },
+  { text: "遇到挫折后，你会主动寻找让自己平静的方法吗？", dimension: "self_repair" },
+  { text: "小事出差错时，你会不会瞬间情绪低落或沮丧？", dimension: "emotion_fluctuation" },
+  { text: "工作/学习压力大时，你是否仍能按计划完成关键事项？", dimension: "stress_tolerance" },
+  { text: "与人相处时，你会频繁揣测“是不是我哪里做错了”？", dimension: "interpersonal_sensitivity" },
+  { text: "夜晚情绪低落时，你会尝试写日记、散步或冥想来缓冲吗？", dimension: "self_repair" },
+  { text: "突发事件时，你的情绪是否容易被放大并影响决策？", dimension: "emotion_fluctuation" },
+  { text: "高压下，你能否把注意力放在当下、而非担心最坏结果？", dimension: "stress_tolerance" },
+  { text: "当别人无回应或回复简短时，你会不会过度解读？", dimension: "interpersonal_sensitivity" },
+  { text: "感到疲惫时，你会主动给自己留出充电休息的时间吗？", dimension: "self_repair" },
+  { text: "你是否经常在一天里出现多次情绪波动？", dimension: "emotion_fluctuation" },
+  { text: "压力来袭时，你是否能分解任务、逐步推进？", dimension: "stress_tolerance" },
+  { text: "社交场合里，你会不会为了一句不经意的话反复回想？", dimension: "interpersonal_sensitivity" },
+  { text: "情绪低谷时，你是否愿意向信任的人寻求支持？", dimension: "self_repair" },
+  { text: "在同一件事情上，你的心情是否常从期待跳到失望？", dimension: "emotion_fluctuation" },
+  { text: "面对超出预期的挑战，你能否维持基本节奏而不失控？", dimension: "stress_tolerance" },
+  { text: "别人表情略有变化时，你会迅速联想到自己被否定吗？", dimension: "interpersonal_sensitivity" },
+  { text: "当情绪受伤时，你会不会写下正向提醒、鼓励自己？", dimension: "self_repair" },
+  { text: "日常琐事的波动是否经常牵动你的心情？", dimension: "emotion_fluctuation" },
+  { text: "突如其来的压力下，你能否保持清晰思路？", dimension: "stress_tolerance" },
+  { text: "当关系中的界限模糊时，你会容易不安或敏感吗？", dimension: "interpersonal_sensitivity" },
+  { text: "忙碌后，你是否会给自己安排小小的奖赏或松弛时间？", dimension: "self_repair" },
+  { text: "情绪激动后，你需要很久才能恢复到平静状态吗？", dimension: "emotion_fluctuation" },
+  { text: "遇到不可控的事情，你能接受现状并寻找可行解吗？", dimension: "stress_tolerance" },
+  { text: "听到他人批评时，你会不会立刻否定自我？", dimension: "interpersonal_sensitivity" },
+  { text: "经历低谷后，你能否总结经验并带着好奇再出发？", dimension: "self_repair" },
+  { text: "你是否容易因为别人的情绪而迅速被带偏？", dimension: "emotion_fluctuation" },
+  { text: "当计划被打乱时，你能否迅速调整、重新安排优先级？", dimension: "stress_tolerance" },
 ];
 
-const OPTION_SCALE = [
-  { label: "几乎从不", value: 1 },
-  { label: "有时如此", value: 2 },
-  { label: "大多如此", value: 3 },
-  { label: "总是如此", value: 4 }
-];
+// LocalStorage 工具
+const storage = {
+  get(key, fallback = null) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw === null || raw === undefined) return fallback;
+      return JSON.parse(raw);
+    } catch (err) {
+      return fallback;
+    }
+  },
+  set(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  },
+  remove(key) {
+    localStorage.removeItem(key);
+  },
+};
 
-const STORAGE_KEY = "emotion-test-state";
-const RESULT_KEY = "emotion-test-score";
-const UID_KEY = "emotion-test-uid";
-const REDEEM_CODE_KEY = "emotion-test-redeem";
-
-function readState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  const fallback = { currentIndex: 0, answers: Array(QUESTIONS.length).fill(null) };
-  try {
-    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
-  } catch (e) {
-    return fallback;
-  }
-}
-
-function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-function clearState() {
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(RESULT_KEY);
-}
-
-function setUid(uid) {
-  if (uid) {
-    localStorage.setItem(UID_KEY, uid);
-  }
-}
-
-function getUid() {
-  return (
-    localStorage.getItem(UID_KEY) ||
-    localStorage.getItem(REDEEM_CODE_KEY) ||
-    `uid-${Date.now()}`
-  );
-}
-
-function showStatus(element, message, isError = false) {
-  if (!element) return;
-  element.textContent = message;
-  element.classList.toggle("error", Boolean(isError));
+function setStatus(el, message, isError = false) {
+  if (!el) return;
+  el.textContent = message || "";
+  el.style.color = isError ? "#d64545" : "#1f7a5a";
 }
 
 async function redeemCode(code, orderId) {
-  const res = await fetch("/api/redeem", {
+  const resp = await fetch("/api/redeem", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code, order_id: orderId })
+    body: JSON.stringify({ code, order_id: orderId || undefined }),
   });
-  return res.json();
+  return resp.json();
 }
 
-async function submitResult(payload) {
-  const res = await fetch("/api/submit", {
+async function submitResult(uid, score, dimensions) {
+  const resp = await fetch("/api/submit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({ uid, score, dimensions }),
   });
-  return res.json();
+  return resp.json();
+}
+
+function computeScores(answers) {
+  const dimensions = {
+    emotion_fluctuation: 0,
+    stress_tolerance: 0,
+    interpersonal_sensitivity: 0,
+    self_repair: 0,
+  };
+  let total = 0;
+  answers.forEach((value, idx) => {
+    if (typeof value === "number") {
+      total += value;
+      const dim = questionBank[idx].dimension;
+      dimensions[dim] += value;
+    }
+  });
+  const stabilityIndex = Math.round((total / 150) * 100);
+  return { total, stabilityIndex, dimensions };
+}
+
+function classifyType(index) {
+  if (index >= 85) return "S";
+  if (index >= 70) return "A";
+  if (index >= 55) return "B";
+  if (index >= 40) return "C";
+  return "D";
+}
+
+const insightsByGrade = {
+  S: {
+    name: "松弛掌控型",
+    portrait: "你的情绪像被阳光晕染的湖面，偶有微澜但总体平稳，能在关键时刻保持清晰判断。",
+    signals: "偶尔的小焦虑更多来自责任感，留意不要为完美主义加码。",
+    strengths: "高水平的自洽与压稳力，能安抚他人情绪并带动团队定心。",
+    suggestions: "继续保持规律的作息与边界感，给自己留出无性能的松弛时刻。",
+    quote: "你已经足够稳，允许自己偶尔慢下来，静听内心的柔软回响。",
+  },
+  A: {
+    name: "稳步向前型",
+    portrait: "你大多时候保持平衡，压力来时能自我调节，偶尔的小波动也能很快复位。",
+    signals: "当外界反馈模糊时会短暂敏感，提醒自己先确认事实，再回应情绪。",
+    strengths: "具备稳定的执行力和温柔的共情力，能给周围人带来安定感。",
+    suggestions: "练习在忙碌后做短暂停顿，比如 5 分钟深呼吸，让情绪有落脚点。",
+    quote: "稳步向前的你，值得把温柔也分给自己，让能量慢慢蓄满。",
+  },
+  B: {
+    name: "波澜可控型",
+    portrait: "情绪偶有波动，但你愿意自我观察并寻找平衡点，整体处于可调节状态。",
+    signals: "在关系与期待受挫时会敏感，容易陷入反复回想。",
+    strengths: "自省力较强，能主动尝试工具（记录、运动、对话）来修复心绪。",
+    suggestions: "设定“情绪缓冲区”，在情绪起伏时先暂停 10 分钟，让自己从事件中抽离。",
+    quote: "波澜会有，但你已经在学会撑伞与靠岸，每一步都算数。",
+  },
+  C: {
+    name: "易感修复型",
+    portrait: "你对外界变化敏感，情绪容易被带动，但也在寻找修复的节奏。",
+    signals: "高压或关系不确定时，容易陷入自我否定或过度揣测。",
+    strengths: "真诚且细腻，愿意为重要的人和事付出，具备温柔的洞察力。",
+    suggestions: "为自己建立清晰的支持清单：呼吸练习、短途散步、向可信的人表达需求。",
+    quote: "请相信，情绪的波动不是缺陷，而是你对世界的深刻感知。",
+  },
+  D: {
+    name: "高敏调适型",
+    portrait: "目前的情绪波动较大，压力与关系反馈会迅速牵动你的内在。",
+    signals: "可能频繁自我怀疑或被情绪拉扯，难以专注当下。",
+    strengths: "敏感是一种天赋，你能捕捉微小的信号，也拥有重新塑造节奏的潜力。",
+    suggestions: "尝试为自己设立每日情绪检查点，记录 3 个让你感到安稳的小事，并寻求专业/信任的支持。",
+    quote: "你值得被温柔对待，也值得把温柔给自己，慢慢来，已经很好。",
+  },
+};
+
+function normalizeDimensions(dimensions) {
+  const counts = {
+    emotion_fluctuation: questionBank.filter((q) => q.dimension === "emotion_fluctuation").length,
+    stress_tolerance: questionBank.filter((q) => q.dimension === "stress_tolerance").length,
+    interpersonal_sensitivity: questionBank.filter((q) => q.dimension === "interpersonal_sensitivity").length,
+    self_repair: questionBank.filter((q) => q.dimension === "self_repair").length,
+  };
+  const normalized = {};
+  Object.keys(dimensions).forEach((key) => {
+    const max = counts[key] * 5 || 1;
+    normalized[key] = Math.round((dimensions[key] / max) * 100);
+  });
+  return normalized;
+}
+
+function renderRadarChart(dimensions) {
+  const ctx = document.getElementById("radar-chart");
+  if (!ctx || typeof Chart === "undefined") return null;
+  const labels = ["情绪波动", "压力承载", "关系敏感", "自我修复"];
+  const data = [
+    dimensions.emotion_fluctuation,
+    dimensions.stress_tolerance,
+    dimensions.interpersonal_sensitivity,
+    dimensions.self_repair,
+  ];
+  return new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "情绪维度",
+          data,
+          backgroundColor: "rgba(45, 160, 122, 0.18)",
+          borderColor: "#2da07a",
+          borderWidth: 2,
+          pointBackgroundColor: "#2da07a",
+        },
+      ],
+    },
+    options: {
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { display: false },
+          grid: { color: "rgba(45,160,122,0.15)" },
+          angleLines: { color: "rgba(45,160,122,0.2)" },
+        },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
+}
+
+function bindSaveReport() {
+  const btn = document.getElementById("save-report");
+  const status = document.getElementById("result-message");
+  if (!btn) return;
+  btn.addEventListener("click", async () => {
+    const card = document.getElementById("report-card");
+    if (!card || typeof html2canvas === "undefined") return;
+    setStatus(status, "正在生成图片…", false);
+    const canvas = await html2canvas(card);
+    const link = document.createElement("a");
+    link.download = "情绪安稳度报告.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    setStatus(status, "报告图片已保存。", false);
+  });
 }
 
 function initRedeemPage() {
-  const input = document.getElementById("redeem-code");
-  const btn = document.getElementById("redeem-submit");
-  const message = document.getElementById("redeem-message");
+  const codeInput = document.getElementById("redeem-code");
   const orderInput = document.getElementById("order-id");
+  const submitBtn = document.getElementById("redeem-submit");
+  const message = document.getElementById("redeem-message");
 
-  const handleRedeem = async () => {
-    const code = (input.value || "").trim();
-    const orderId = (orderInput?.value || "").trim();
+  if (!submitBtn) return;
+  submitBtn.addEventListener("click", async () => {
+    const code = codeInput?.value?.trim();
+    const orderId = orderInput?.value?.trim();
     if (!code) {
-      showStatus(message, "兑换码不能为空", true);
+      setStatus(message, "请填写兑换码噢~", true);
       return;
     }
-    showStatus(message, "正在验证兑换码…");
-    btn.disabled = true;
+    submitBtn.disabled = true;
+    setStatus(message, "正在校验兑换码…", false);
     try {
-      const result = await redeemCode(code, orderId || undefined);
+      const result = await redeemCode(code, orderId);
       if (result.success) {
-        // 成功后保存 uid & 兑换码，并清理进度
-        localStorage.setItem(REDEEM_CODE_KEY, code);
-        setUid(orderId || code);
-        clearState();
-        showStatus(message, "兑换成功，正在跳转…");
-        setTimeout(() => (window.location.href = "test.html"), 400);
+        storage.set("et_code", code);
+        storage.set("et_order", orderId || "");
+        storage.set("et_uid", orderId || code);
+        storage.set("et_answers", Array(questionBank.length).fill(null));
+        storage.set("et_progress", 0);
+        storage.remove("et_result");
+        window.location.href = "test.html";
       } else {
-        showStatus(message, result.message || "兑换失败", true);
+        setStatus(message, result.message || "兑换失败，请稍后重试", true);
       }
     } catch (err) {
-      showStatus(message, err?.message || "网络错误，请稍后重试", true);
+      setStatus(message, "服务暂时不可用，请稍后重试", true);
     } finally {
-      btn.disabled = false;
+      submitBtn.disabled = false;
     }
-  };
-
-  btn.addEventListener("click", handleRedeem);
-  input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") handleRedeem();
   });
 }
 
-function renderQuestion(state) {
-  const title = document.getElementById("question-title");
-  const progress = document.getElementById("question-progress");
-  const bar = document.getElementById("progress-bar");
-  const optionsWrap = document.getElementById("options");
+function renderQuestion(index, answers) {
+  const questionText = document.getElementById("question-text");
+  const optionList = document.getElementById("option-list");
+  const progressText = document.getElementById("progress-text");
+  const progressBar = document.getElementById("progress-bar");
+
+  const question = questionBank[index];
+  if (!questionText || !optionList || !question) return;
+
+  questionText.textContent = question.text;
+  optionList.innerHTML = "";
+  optionLabels.forEach((label, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn" + (answers[index] === idx + 1 ? " selected" : "");
+    btn.textContent = label;
+    btn.type = "button";
+    btn.dataset.value = String(idx + 1);
+    btn.addEventListener("click", () => handleAnswer(index, idx + 1));
+    optionList.appendChild(btn);
+  });
+
+  if (progressText) progressText.textContent = `第 ${index + 1} / ${questionBank.length} 题`;
+  if (progressBar) progressBar.style.width = `${((index + 1) / questionBank.length) * 100}%`;
+}
+
+function handleAnswer(index, value) {
   const message = document.getElementById("test-message");
-  const nextBtn = document.getElementById("next-question");
+  const answers = storage.get("et_answers", Array(questionBank.length).fill(null));
+  answers[index] = value;
+  storage.set("et_answers", answers);
 
-  if (!title || !optionsWrap) return;
-
-  const current = state.currentIndex;
-  title.textContent = QUESTIONS[current];
-  progress.textContent = `第 ${current + 1} / ${QUESTIONS.length} 题`;
-  if (bar) {
-    const percent = Math.round(((current + 1) / QUESTIONS.length) * 100);
-    bar.style.width = `${percent}%`;
-    bar.textContent = `${percent}%`;
+  if (index < questionBank.length - 1) {
+    const nextIndex = index + 1;
+    storage.set("et_progress", nextIndex);
+    renderQuestion(nextIndex, answers);
+  } else {
+    finalizeTest(answers, message);
   }
-
-  optionsWrap.innerHTML = "";
-  OPTION_SCALE.forEach((item) => {
-    const option = document.createElement("button");
-    option.className = "option-card";
-    option.type = "button";
-    option.innerHTML = `<span>${item.label}</span><span>${item.value} 分</span>`;
-    if (state.answers[current] === item.value) {
-      option.classList.add("selected");
-    }
-    option.addEventListener("click", () => {
-      state.answers[current] = item.value;
-      saveState(state);
-      showStatus(message, "已选择，点击下一题继续。");
-      Array.from(optionsWrap.children).forEach((child) => child.classList.remove("selected"));
-      option.classList.add("selected");
-    });
-    optionsWrap.appendChild(option);
-  });
-
-  nextBtn.textContent = current === QUESTIONS.length - 1 ? "完成测评" : "下一题";
 }
 
-function initTestPage() {
-  const state = readState();
-  const message = document.getElementById("test-message");
-  const nextBtn = document.getElementById("next-question");
-  const resetBtn = document.getElementById("reset-progress");
-
-  renderQuestion(state);
-
-  nextBtn.addEventListener("click", async () => {
-    if (state.answers[state.currentIndex] == null) {
-      showStatus(message, "请选择一个选项再继续", true);
-      return;
-    }
-    if (state.currentIndex < QUESTIONS.length - 1) {
-      state.currentIndex += 1;
-      saveState(state);
-      renderQuestion(state);
-      showStatus(message, "进度已保存");
-    } else {
-      const score = state.answers.reduce((sum, v) => sum + Number(v || 0), 0);
-      const uid = getUid();
-      showStatus(message, "正在提交结果…");
-      nextBtn.disabled = true;
-      try {
-        const response = await submitResult({ score, uid });
-        if (response.success) {
-          localStorage.setItem(RESULT_KEY, String(score));
-          showStatus(message, "提交成功，正在跳转结果页…");
-          setTimeout(() => {
-            window.location.href = `result.html?score=${score}`;
-          }, 400);
-        } else {
-          showStatus(message, response.message || "提交失败，请稍后再试", true);
-        }
-      } catch (err) {
-        showStatus(message, err?.message || "网络错误，请稍后重试", true);
-      } finally {
-        nextBtn.disabled = false;
-      }
-    }
-  });
-
-  resetBtn.addEventListener("click", () => {
-    clearState();
-    const fresh = readState();
-    renderQuestion(fresh);
-    showStatus(message, "已清除进度，回到第一题。", false);
-  });
-}
-
-function buildAnalysis(score) {
-  if (score <= 30) {
-    return "情绪波动较大，建议先保证休息与安全感，如有需要可寻求专业支持。";
+async function finalizeTest(answers, messageEl) {
+  if (answers.some((v) => v === null)) {
+    setStatus(messageEl, "还有未完成的题目哦~", true);
+    return;
   }
-  if (score <= 60) {
-    return "情绪稳定度中等，可多练习放松与情绪记录，逐步提升耐受度。";
-  }
-  if (score <= 90) {
-    return "整体较为平稳，保持觉察与自我关怀，继续巩固有效的调节方式。";
-  }
-  return "情绪韧性良好，能稳住起伏并灵活应对，请持续保持健康的生活节奏。";
-}
-
-function initResultPage() {
-  const scoreText = document.getElementById("score-value");
-  const analysisText = document.getElementById("analysis");
-
-  const params = new URLSearchParams(window.location.search);
-  const scoreFromQuery = params.get("score");
-  const stored = localStorage.getItem(RESULT_KEY);
-  const rawScore = scoreFromQuery || stored;
-
-  if (!rawScore) {
-    scoreText.textContent = "--";
-    analysisText.textContent = "未找到分数，请先完成测评。";
+  const uid = storage.get("et_uid", "");
+  if (!uid) {
+    setStatus(messageEl, "身份信息缺失，请重新兑换进入。", true);
+    setTimeout(() => (window.location.href = "index.html"), 1500);
     return;
   }
 
-  const score = Number(rawScore);
-  scoreText.textContent = `${score} 分`;
-  analysisText.textContent = buildAnalysis(score);
+  const { total, stabilityIndex, dimensions } = computeScores(answers);
+  const grade = classifyType(stabilityIndex);
+  const normalized = normalizeDimensions(dimensions);
+  const result = { score: total, stabilityIndex, dimensions: normalized, grade };
+  storage.set("et_result", result);
+
+  setStatus(messageEl, "正在提交结果…", false);
+  try {
+    const resp = await submitResult(uid, total, normalized);
+    if (!resp.success) {
+      setStatus(messageEl, resp.message || "提交失败，请稍后重试", true);
+      return;
+    }
+    setStatus(messageEl, "提交成功，正在生成报告…", false);
+    setTimeout(() => {
+      window.location.href = "result.html";
+    }, 400);
+  } catch (err) {
+    setStatus(messageEl, "提交失败，请稍后重试", true);
+  }
 }
 
-(function bootstrap() {
+function initTestPage() {
+  const uid = storage.get("et_uid", "");
+  if (!uid) {
+    window.location.href = "index.html";
+    return;
+  }
+  const answers = storage.get("et_answers", Array(questionBank.length).fill(null));
+  const startIndex = Math.min(storage.get("et_progress", 0) || 0, questionBank.length - 1);
+  renderQuestion(startIndex, answers);
+}
+
+function initResultPage() {
+  const result = storage.get("et_result", null);
+  const message = document.getElementById("result-message");
+  if (!result) {
+    setStatus(message, "未找到测评数据，请重新开始。", true);
+    return;
+  }
+  const profile = insightsByGrade[result.grade] || insightsByGrade.D;
+  const typeLabel = document.getElementById("type-label");
+  const scoreNumber = document.getElementById("score-number");
+  const emotionPortrait = document.getElementById("emotion-portrait");
+  const smallSignals = document.getElementById("small-signals");
+  const hiddenStrengths = document.getElementById("hidden-strengths");
+  const suggestions = document.getElementById("suggestions");
+  const goldenLine = document.getElementById("golden-line");
+  const dimensionList = document.getElementById("dimension-list");
+
+  if (typeLabel) typeLabel.textContent = `${result.grade} · ${profile.name}`;
+  if (scoreNumber) scoreNumber.textContent = `${result.stabilityIndex}`;
+  if (emotionPortrait) emotionPortrait.textContent = profile.portrait;
+  if (smallSignals) smallSignals.textContent = profile.signals;
+  if (hiddenStrengths) hiddenStrengths.textContent = profile.strengths;
+  if (suggestions) suggestions.textContent = profile.suggestions;
+  if (goldenLine) goldenLine.textContent = profile.quote;
+
+  if (dimensionList) {
+    dimensionList.innerHTML = "";
+    const labels = {
+      emotion_fluctuation: "情绪波动",
+      stress_tolerance: "压力承载",
+      interpersonal_sensitivity: "关系敏感",
+      self_repair: "自我修复",
+    };
+    Object.keys(result.dimensions).forEach((key) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span>${labels[key] || key}</span><strong>${result.dimensions[key]}</strong>`;
+      dimensionList.appendChild(li);
+    });
+  }
+
+  renderRadarChart(result.dimensions);
+  bindSaveReport();
+}
+
+function initPage() {
   const page = document.body.dataset.page;
   if (page === "redeem") initRedeemPage();
   if (page === "test") initTestPage();
   if (page === "result") initResultPage();
-})();
+}
+
+document.addEventListener("DOMContentLoaded", initPage);
