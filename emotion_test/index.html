@@ -43,3 +43,39 @@
   <script src="script.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>情绪稳定度测试｜兑换码入口</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="redeem">
+  <main class="page">
+    <section class="card hero">
+      <div>
+        <p class="eyebrow">情绪稳定度测试</p>
+        <h1 class="title">输入兑换码，开启 30 道情绪稳定度测评</h1>
+        <p class="subtitle">验证通过后即可开始答题，结果会写入飞书多维表格，便于数据管理。</p>
+      </div>
+      <div class="redeem-form" role="form" aria-label="兑换码表单">
+        <label for="redeem-code" class="label">兑换码</label>
+        <div class="redeem-row">
+          <input id="redeem-code" type="text" placeholder="请输入兑换码" autocomplete="one-time-code" />
+          <button id="redeem-submit" class="btn primary">开始测评</button>
+        </div>
+        <label for="order-id" class="label">可选：订单号 / 用户标识</label>
+        <input id="order-id" type="text" placeholder="用于记录到表格，非必填" />
+        <p id="redeem-message" class="status"></p>
+      </div>
+      <ul class="bullets">
+        <li>成功验证后将跳转到题目页面。</li>
+        <li>失败会显示错误提示，不会扣减兑换次数。</li>
+        <li>题目进度自动保存，刷新不丢失。</li>
+      </ul>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
