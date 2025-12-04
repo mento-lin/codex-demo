@@ -13,25 +13,43 @@ module.exports = (req, res) => {
     });
   }
 
-  // 规范一下用户输入：去空格、转大写
   const inputCode = String(code).trim().toUpperCase();
 
-  // 读取 data/codes.json 里的白名单
-  const filePath = path.join(process.cwd(), "data", "codes.json");
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const data = JSON.parse(fileContent);
-  const codes = data.codes || [];
+  // 注意！！！你的 codes.json 在 “数据” 文件夹下
+  const filePath = path.join(process.cwd(), "数据", "codes.json");
 
+  let fileContent = "";
+  try {
+    fileContent = fs.readFileSync(filePath, "utf-8");
+  } catch (err) {
+    console.error("读取 codes.json 失败：", err);
+    return res.status(500).json({
+      ok: false,
+      message: "服务端读取兑换码失败",
+    });
+  }
+
+  let data = {};
+  try {
+    data = JSON.parse(fileContent);
+  } catch (err) {
+    console.error("解析 JSON 失败：", err);
+    return res.status(500).json({
+      ok: false,
+      message: "兑换码数据格式错误",
+    });
+  }
+
+  const codes = data.codes || [];
   const exists = codes.includes(inputCode);
 
   if (!exists) {
     return res.status(400).json({
       ok: false,
-      message: "兑换码不存在或填写错误",
+      message: "兑换码不存在或已失效",
     });
   }
 
-  // 简单版：只判断“在不在这批码里”，不做“已使用”判断
   return res.status(200).json({
     ok: true,
     message: "验证通过",
