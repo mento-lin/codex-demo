@@ -638,11 +638,9 @@ function setStatus(el, message, isError = false) {
   el.style.color = isError ? "#d64545" : "#1f7a5a";
 }
 
-async function redeemCode(code, orderId) {
-  const resp = await fetch("/api/redeem", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code, order_id: orderId || undefined }),
+async function redeemCode(code) {
+  const resp = await fetch(`/api/check-code?code=${encodeURIComponent(code)}`, {
+    method: "GET",
   });
   return resp.json();
 }
@@ -972,3 +970,4 @@ function initPage() {
 }
 
 document.addEventListener("DOMContentLoaded", initPage);
+
