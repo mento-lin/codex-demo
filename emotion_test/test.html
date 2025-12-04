@@ -36,24 +36,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>情绪稳定度测试｜题目</title>
+  <title>情绪安稳度测评｜答题</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body data-page="test">
   <main class="page">
-    <section class="card">
-      <p class="eyebrow">共 30 题 · 自动保存</p>
-      <div class="progress-wrap" aria-label="答题进度">
-        <div id="progress-bar" class="progress-bar">0%</div>
+    <section class="card test-card">
+      <div class="test-header">
+        <div>
+          <p class="eyebrow">情绪安稳度测评</p>
+          <h1 class="title small">治愈绿 30 题 · 单选</h1>
+          <p class="subtitle">点击选项自动进入下一题，实时保存进度。</p>
+        </div>
+        <div class="progress-box">
+          <span id="progress-text">第 1 / 30 题</span>
+          <div class="progress-track"><div id="progress-bar"></div></div>
+        </div>
       </div>
-      <h1 class="title" id="question-title">加载中…</h1>
-      <p id="question-progress" class="subtitle"></p>
-      <div id="options" class="options"></div>
-      <div class="actions">
-        <button id="next-question" class="btn primary">下一题</button>
-        <button id="reset-progress" class="btn ghost" type="button">清除进度</button>
+      <div class="question-body">
+        <div id="question-text" class="question-text"></div>
+        <div id="option-list" class="option-list" role="list"></div>
+        <p id="test-message" class="status"></p>
       </div>
-      <p id="test-message" class="status"></p>
     </section>
   </main>
   <script src="script.js"></script>
