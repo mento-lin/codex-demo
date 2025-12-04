@@ -1,11 +1,9 @@
 /******************************
- *  情绪安稳度测评 - 最终本地版
- *  无需飞书，无需 API，无需 /api
+ *  情绪安稳度测评 - 使用 codes.json 校验兑换码
+ *  不暴露兑换码，不依赖 API
  ******************************/
 
-// =====================
-// 题库（30题）
-// =====================
+// ============ 30 题题库 ============
 const QUESTIONS = [
   { id: 1, text: "我能觉察到情绪的起伏，并尝试温柔地安放它们。", dimension: "emotion_fluctuation" },
   { id: 2, text: "遇到压力时，我会给自己留出喘息的空间再继续。", dimension: "stress_tolerance" },
@@ -36,49 +34,65 @@ const QUESTIONS = [
   { id: 27, text: "在人际互动中，我会尊重彼此的节奏，不强迫自己。", dimension: "interpersonal_sensitivity" },
   { id: 28, text: "我有让自己恢复能量的惯例，比如睡前放松或音乐。", dimension: "self_repair" },
   { id: 29, text: "我能觉察到情绪波动的信号，并提前照顾自己。", dimension: "emotion_fluctuation" },
-  { id: 30, text: "当压力积累时，我愿意向可信赖的人求助。", dimension: "stress_tolerance" },
+  { id: 30, text: "当压力积累时，我愿意向可信赖的人求助。", dimension: "stress_tolerance" }
 ];
 
 const OPTION_TEXTS = ["非常不符合", "有点不符合", "一般般", "比较符合", "非常符合"];
 
-// 本地兑换码（你可随时修改）
-const VALID_REDEEM_CODES = ["GREEN2024", "CALMHEAL", "SOFTCARE"];
-
 // =====================
-// 本地校验兑换码
+// 读取 codes.json（兑换码数据库）
 // =====================
-function validateRedeemCode(code) {
-  const trimmed = (code || "").trim();
-  if (!trimmed) return { ok: false, error: "empty" };
-  if (VALID_REDEEM_CODES.includes(trimmed)) return { ok: true };
-  return { ok: false, error: "invalid" };
+async function loadCodes() {
+  try {
+    const res = await fetch("codes.json");
+    const data = await res.json();
+    return data.codes.map(c => c.code);
+  } catch (e) {
+    console.error("无法读取 codes.json", e);
+    return [];
+  }
 }
 
 // =====================
-// 页面初始化（index）
+// 校验兑换码（从 codes.json）
+// =====================
+async function validateRedeemCode(code) {
+  const allCodes = await loadCodes();
+  return allCodes.includes(code.trim());
+}
+
+// =====================
+// 首页处理兑换
 // =====================
 function setupHomePage() {
-  const startBtn = document.getElementById("redeem-submit");
-  if (!startBtn) return;
+  const btn = document.getElementById("redeem-submit");
+  if (!btn) return;
 
-  startBtn.addEventListener("click", () => {
-    const codeInput = document.getElementById("redeem-code");
-    const message = document.getElementById("redeem-message");
-    const code = codeInput.value.trim();
+  btn.addEventListener("click", async () => {
+    const code = document.getElementById("redeem-code").value.trim();
+    const msg = document.getElementById("redeem-message");
 
-    const check = validateRedeemCode(code);
-    if (!check.ok) {
-      message.textContent = check.error === "empty" ? "请输入兑换码" : "兑换码无效";
-      message.style.color = "#d33";
+    if (!code) {
+      msg.textContent = "请输入兑换码";
+      msg.style.color = "#d33";
+      return;
+    }
+
+    msg.textContent = "正在验证兑换码…";
+
+    const valid = await validateRedeemCode(code);
+    if (!valid) {
+      msg.textContent = "兑换码无效";
+      msg.style.color = "#d33";
       return;
     }
 
     // 保存兑换码
     localStorage.setItem("redeemCode", code);
-    localStorage.setItem("emotionTestAnswers", JSON.stringify(Array(QUESTIONS.length).fill(null)));
+    localStorage.setItem("emotionTestAnswers", JSON.stringify(Array(30).fill(null)));
 
-    message.textContent = "兑换成功，正在跳转…";
-    message.style.color = "#2e7";
+    msg.textContent = "兑换成功，正在跳转…";
+    msg.style.color = "#2e7";
 
     setTimeout(() => (window.location.href = "test.html"), 400);
   });
@@ -88,12 +102,12 @@ function setupHomePage() {
 // test.html 渲染题目
 // =====================
 function renderTestPage() {
-  if (!document.body.dataset.page === "test") return;
+  if (document.body.dataset.page !== "test") return;
 
-  const answers = JSON.parse(localStorage.getItem("emotionTestAnswers")) || Array(QUESTIONS.length).fill(null);
+  let answers = JSON.parse(localStorage.getItem("emotionTestAnswers")) || Array(30).fill(null);
   let index = 0;
 
-  function renderQuestion(i) {
+  function renderQ(i) {
     index = i;
 
     document.getElementById("question-text").textContent = QUESTIONS[i].text;
@@ -102,16 +116,16 @@ function renderTestPage() {
     const optionsEl = document.getElementById("options");
     optionsEl.innerHTML = "";
 
-    OPTION_TEXTS.forEach((text, idx) => {
+    OPTION_TEXTS.forEach((t, idx) => {
       const btn = document.createElement("button");
       btn.className = "option-btn";
-      btn.textContent = `${"ABCDE"[idx]}  ${text}`;
-      btn.onclick = () => handleSelect(idx + 1);
+      btn.textContent = `${"ABCDE"[idx]}  ${t}`;
       if (answers[i] === idx + 1) btn.classList.add("active");
+      btn.onclick = () => handleSelect(idx + 1);
       optionsEl.appendChild(btn);
     });
 
-    document.getElementById("progress-bar").style.width = `${(i / 30) * 100}%`;
+    document.getElementById("progress-bar").style.width = `${(i / 29) * 100}%`;
   }
 
   function handleSelect(val) {
@@ -119,32 +133,32 @@ function renderTestPage() {
     localStorage.setItem("emotionTestAnswers", JSON.stringify(answers));
 
     if (index < 29) {
-      setTimeout(() => renderQuestion(index + 1), 600);
+      setTimeout(() => renderQ(index + 1), 600);
     } else {
       setTimeout(() => (window.location.href = "result.html"), 600);
     }
   }
 
-  renderQuestion(0);
+  renderQ(0);
 }
 
 // =====================
 // 计算结果
 // =====================
-function calculateResult() {
-  const answers = JSON.parse(localStorage.getItem("emotionTestAnswers")) || [];
-  if (answers.length !== 30 || answers.includes(null)) {
+function calcResult() {
+  const ans = JSON.parse(localStorage.getItem("emotionTestAnswers"));
+  if (!ans || ans.includes(null)) {
     window.location.href = "test.html";
     return;
   }
 
-  const total = answers.reduce((a, b) => a + b, 0);
+  const total = ans.reduce((a, b) => a + b, 0);
   const stableIndex = Math.round((total / 150) * 100);
 
   const dims = { emotion_fluctuation: 0, stress_tolerance: 0, interpersonal_sensitivity: 0, self_repair: 0 };
-  QUESTIONS.forEach((q, i) => (dims[q.dimension] += answers[i]));
+  QUESTIONS.forEach((q, i) => (dims[q.dimension] += ans[i]));
 
-  const normalize = (val) => Math.round((val / 37.5) * 100);
+  const normalize = v => Math.round((v / 37.5) * 100);
 
   return {
     stableIndex,
@@ -152,8 +166,8 @@ function calculateResult() {
       emotion_fluctuation: normalize(dims.emotion_fluctuation),
       stress_tolerance: normalize(dims.stress_tolerance),
       interpersonal_sensitivity: normalize(dims.interpersonal_sensitivity),
-      self_repair: normalize(dims.self_repair),
-    },
+      self_repair: normalize(dims.self_repair)
+    }
   };
 }
 
@@ -163,22 +177,20 @@ function calculateResult() {
 function renderResultPage() {
   if (document.body.dataset.page !== "result") return;
 
-  const res = calculateResult();
-  if (!res) return;
+  const r = calcResult();
+  if (!r) return;
 
-  document.getElementById("stable-index").textContent = res.stableIndex;
+  document.getElementById("stable-index").textContent = r.stableIndex;
 
-  // 分类方式
   let type = "B";
-  if (res.stableIndex >= 85) type = "S";
-  else if (res.stableIndex >= 75) type = "A";
-  else if (res.stableIndex >= 60) type = "B";
-  else if (res.stableIndex >= 45) type = "C";
+  if (r.stableIndex >= 85) type = "S";
+  else if (r.stableIndex >= 75) type = "A";
+  else if (r.stableIndex >= 60) type = "B";
+  else if (r.stableIndex >= 45) type = "C";
   else type = "D";
 
   document.getElementById("emotion-type").textContent = type;
 
-  // 雷达图
   new Chart(document.getElementById("emotion-radar"), {
     type: "radar",
     data: {
@@ -186,23 +198,23 @@ function renderResultPage() {
       datasets: [
         {
           data: [
-            res.dimensions.emotion_fluctuation,
-            res.dimensions.stress_tolerance,
-            res.dimensions.interpersonal_sensitivity,
-            res.dimensions.self_repair,
+            r.dimensions.emotion_fluctuation,
+            r.dimensions.stress_tolerance,
+            r.dimensions.interpersonal_sensitivity,
+            r.dimensions.self_repair
           ],
-          backgroundColor: "rgba(127, 184, 164, 0.25)",
-          borderColor: "rgba(92, 156, 133, 1)",
-          borderWidth: 2,
-        },
-      ],
+          backgroundColor: "rgba(127,184,164,0.25)",
+          borderColor: "#5c9c85",
+          borderWidth: 2
+        }
+      ]
     },
-    options: { scales: { r: { min: 0, max: 100 } }, plugins: { legend: { display: false } } },
+    options: { scales: { r: { min: 0, max: 100 } }, plugins: { legend: { display: false } } }
   });
 }
 
 // =====================
-// 全局初始化
+// 初始化
 // =====================
 document.addEventListener("DOMContentLoaded", () => {
   setupHomePage();
