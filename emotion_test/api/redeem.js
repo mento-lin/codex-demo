@@ -1,5 +1,17 @@
 const axios = require("axios");
 
+async function getTenantToken() {
+  const resp = await axios.post(
+    "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
+    {
+      app_id: process.env.FEISHU_APP_ID,
+      app_secret: process.env.FEISHU_APP_SECRET
+    }
+  );
+
+  return resp.data.tenant_access_token;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
@@ -12,10 +24,14 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // 搜记录
+    const token = await getTenantToken();
+
+    // 搜索兑换码记录
     const searchResp = await axios.get(
       `https://open.feishu.cn/open-apis/bitable/v1/apps/${process.env.FEISHU_BASE_ID}/tables/${process.env.REDEEM_TABLE_ID}/records?filter=CurrentValue.code="${code}"`,
-      { headers: { Authorization: `Bearer ${process.env.FEISHU_APP_SECRET}` } }
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
     );
 
     const record = searchResp.data?.data?.items?.[0];
@@ -27,7 +43,7 @@ module.exports = async function handler(req, res) {
       return res.json({ success: false, message: "兑换码已被使用" });
     }
 
-    // 更新记录
+    // 更新兑换码状态
     await axios.patch(
       `https://open.feishu.cn/open-apis/bitable/v1/apps/${process.env.FEISHU_BASE_ID}/tables/${process.env.REDEEM_TABLE_ID}/records/${record.record_id}`,
       {
@@ -37,12 +53,14 @@ module.exports = async function handler(req, res) {
           used_at: new Date().toISOString()
         }
       },
-      { headers: { Authorization: `Bearer ${process.env.FEISHU_APP_SECRET}` } }
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
     );
 
     return res.json({ success: true, message: "兑换成功，可以开始测试" });
   } catch (e) {
+    console.error(e);
     return res.status(500).json({ success: false, message: e.message });
   }
 };
-
