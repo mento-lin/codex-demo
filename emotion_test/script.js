@@ -578,3 +578,276 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+// 公共前端逻辑
+const QUESTIONS = [
+  "最近 1 周，你能保持平稳的心态面对变化。",
+  "遇到不顺时，你能在短时间内缓和情绪。",
+  "你会主动观察并记录自己的情绪起伏。",
+  "感到紧张时，你能找到让自己放松的办法。",
+  "压力来临时，你仍能按计划完成任务。",
+  "你会向信任的人寻求支持。",
+  "你能接受自己偶尔的情绪低落。",
+  "焦虑时，你会使用深呼吸或冥想。",
+  "你能把注意力转向可执行的步骤。",
+  "沟通时，你能温和表达需求。",
+  "情绪激动时，你会先冷静再行动。",
+  "你相信不安是暂时的。",
+  "你能清晰描述当下的情绪。",
+  "面对他人激动，你能不被完全带跑。",
+  "你愿意为自己的情绪反应负责。",
+  "你会为情绪设定健康的界限。",
+  "你保持相对稳定的作息。",
+  "突发事件时，你会先评估再行动。",
+  "你能分辨情绪背后的需求。",
+  "不顺利时，你仍能看到成长。",
+  "你愿意适度分享脆弱。",
+  "忙碌时，你会安排休息。",
+  "你会反思触发点并调整相处方式。",
+  "情绪失控后，你会修复关系。",
+  "压力下，你能保持理性决策。",
+  "你会用运动、音乐等方式调节。",
+  "你理解情绪是信号，而非敌人。",
+  "面对批评，你会分辨事实与情绪。",
+  "需要时，你会寻求专业支持。",
+  "你相信自己能够逐步稳定情绪。"
+];
+
+const OPTION_SCALE = [
+  { label: "几乎从不", value: 1 },
+  { label: "有时如此", value: 2 },
+  { label: "大多如此", value: 3 },
+  { label: "总是如此", value: 4 }
+];
+
+const STORAGE_KEY = "emotion-test-state";
+const RESULT_KEY = "emotion-test-score";
+const UID_KEY = "emotion-test-uid";
+const REDEEM_CODE_KEY = "emotion-test-redeem";
+
+function readState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const fallback = { currentIndex: 0, answers: Array(QUESTIONS.length).fill(null) };
+  try {
+    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function clearState() {
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(RESULT_KEY);
+}
+
+function setUid(uid) {
+  if (uid) {
+    localStorage.setItem(UID_KEY, uid);
+  }
+}
+
+function getUid() {
+  return (
+    localStorage.getItem(UID_KEY) ||
+    localStorage.getItem(REDEEM_CODE_KEY) ||
+    `uid-${Date.now()}`
+  );
+}
+
+function showStatus(element, message, isError = false) {
+  if (!element) return;
+  element.textContent = message;
+  element.classList.toggle("error", Boolean(isError));
+}
+
+async function redeemCode(code, orderId) {
+  const res = await fetch("/api/redeem", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, order_id: orderId })
+  });
+  return res.json();
+}
+
+async function submitResult(payload) {
+  const res = await fetch("/api/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+function initRedeemPage() {
+  const input = document.getElementById("redeem-code");
+  const btn = document.getElementById("redeem-submit");
+  const message = document.getElementById("redeem-message");
+  const orderInput = document.getElementById("order-id");
+
+  const handleRedeem = async () => {
+    const code = (input.value || "").trim();
+    const orderId = (orderInput?.value || "").trim();
+    if (!code) {
+      showStatus(message, "兑换码不能为空", true);
+      return;
+    }
+    showStatus(message, "正在验证兑换码…");
+    btn.disabled = true;
+    try {
+      const result = await redeemCode(code, orderId || undefined);
+      if (result.success) {
+        // 成功后保存 uid & 兑换码，并清理进度
+        localStorage.setItem(REDEEM_CODE_KEY, code);
+        setUid(orderId || code);
+        clearState();
+        showStatus(message, "兑换成功，正在跳转…");
+        setTimeout(() => (window.location.href = "test.html"), 400);
+      } else {
+        showStatus(message, result.message || "兑换失败", true);
+      }
+    } catch (err) {
+      showStatus(message, err?.message || "网络错误，请稍后重试", true);
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  btn.addEventListener("click", handleRedeem);
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") handleRedeem();
+  });
+}
+
+function renderQuestion(state) {
+  const title = document.getElementById("question-title");
+  const progress = document.getElementById("question-progress");
+  const bar = document.getElementById("progress-bar");
+  const optionsWrap = document.getElementById("options");
+  const message = document.getElementById("test-message");
+  const nextBtn = document.getElementById("next-question");
+
+  if (!title || !optionsWrap) return;
+
+  const current = state.currentIndex;
+  title.textContent = QUESTIONS[current];
+  progress.textContent = `第 ${current + 1} / ${QUESTIONS.length} 题`;
+  if (bar) {
+    const percent = Math.round(((current + 1) / QUESTIONS.length) * 100);
+    bar.style.width = `${percent}%`;
+    bar.textContent = `${percent}%`;
+  }
+
+  optionsWrap.innerHTML = "";
+  OPTION_SCALE.forEach((item) => {
+    const option = document.createElement("button");
+    option.className = "option-card";
+    option.type = "button";
+    option.innerHTML = `<span>${item.label}</span><span>${item.value} 分</span>`;
+    if (state.answers[current] === item.value) {
+      option.classList.add("selected");
+    }
+    option.addEventListener("click", () => {
+      state.answers[current] = item.value;
+      saveState(state);
+      showStatus(message, "已选择，点击下一题继续。");
+      Array.from(optionsWrap.children).forEach((child) => child.classList.remove("selected"));
+      option.classList.add("selected");
+    });
+    optionsWrap.appendChild(option);
+  });
+
+  nextBtn.textContent = current === QUESTIONS.length - 1 ? "完成测评" : "下一题";
+}
+
+function initTestPage() {
+  const state = readState();
+  const message = document.getElementById("test-message");
+  const nextBtn = document.getElementById("next-question");
+  const resetBtn = document.getElementById("reset-progress");
+
+  renderQuestion(state);
+
+  nextBtn.addEventListener("click", async () => {
+    if (state.answers[state.currentIndex] == null) {
+      showStatus(message, "请选择一个选项再继续", true);
+      return;
+    }
+    if (state.currentIndex < QUESTIONS.length - 1) {
+      state.currentIndex += 1;
+      saveState(state);
+      renderQuestion(state);
+      showStatus(message, "进度已保存");
+    } else {
+      const score = state.answers.reduce((sum, v) => sum + Number(v || 0), 0);
+      const uid = getUid();
+      showStatus(message, "正在提交结果…");
+      nextBtn.disabled = true;
+      try {
+        const response = await submitResult({ score, uid });
+        if (response.success) {
+          localStorage.setItem(RESULT_KEY, String(score));
+          showStatus(message, "提交成功，正在跳转结果页…");
+          setTimeout(() => {
+            window.location.href = `result.html?score=${score}`;
+          }, 400);
+        } else {
+          showStatus(message, response.message || "提交失败，请稍后再试", true);
+        }
+      } catch (err) {
+        showStatus(message, err?.message || "网络错误，请稍后重试", true);
+      } finally {
+        nextBtn.disabled = false;
+      }
+    }
+  });
+
+  resetBtn.addEventListener("click", () => {
+    clearState();
+    const fresh = readState();
+    renderQuestion(fresh);
+    showStatus(message, "已清除进度，回到第一题。", false);
+  });
+}
+
+function buildAnalysis(score) {
+  if (score <= 30) {
+    return "情绪波动较大，建议先保证休息与安全感，如有需要可寻求专业支持。";
+  }
+  if (score <= 60) {
+    return "情绪稳定度中等，可多练习放松与情绪记录，逐步提升耐受度。";
+  }
+  if (score <= 90) {
+    return "整体较为平稳，保持觉察与自我关怀，继续巩固有效的调节方式。";
+  }
+  return "情绪韧性良好，能稳住起伏并灵活应对，请持续保持健康的生活节奏。";
+}
+
+function initResultPage() {
+  const scoreText = document.getElementById("score-value");
+  const analysisText = document.getElementById("analysis");
+
+  const params = new URLSearchParams(window.location.search);
+  const scoreFromQuery = params.get("score");
+  const stored = localStorage.getItem(RESULT_KEY);
+  const rawScore = scoreFromQuery || stored;
+
+  if (!rawScore) {
+    scoreText.textContent = "--";
+    analysisText.textContent = "未找到分数，请先完成测评。";
+    return;
+  }
+
+  const score = Number(rawScore);
+  scoreText.textContent = `${score} 分`;
+  analysisText.textContent = buildAnalysis(score);
+}
+
+(function bootstrap() {
+  const page = document.body.dataset.page;
+  if (page === "redeem") initRedeemPage();
+  if (page === "test") initTestPage();
+  if (page === "result") initResultPage();
+})();
