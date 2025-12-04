@@ -5,7 +5,7 @@ async function getTenantToken() {
     "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal",
     {
       app_id: process.env.FEISHU_APP_ID,
-      app_secret: process.env.FEISHU_APP_SECRET,
+      app_secret: process.env.FEISHU_APP_SECRET
     }
   );
   return resp.data.tenant_access_token;
@@ -23,13 +23,21 @@ module.exports = async function handler(req, res) {
 
     await axios.post(
       `https://open.feishu.cn/open-apis/bitable/v1/apps/${process.env.FEISHU_BASE_ID}/tables/${process.env.RESULTS_TABLE_ID}/records`,
-      { fields: { uid, score } },
-      { headers: { Authorization: `Bearer ${token}` } }
+      {
+        fields: { uid, score }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
     );
 
     res.json({ success: true });
   } catch (e) {
-    res.status(500).json({ success: false, message: e.message });
+    console.error(e.response?.data || e);
+    res.status(500).json({ success: false, message: "提交失败" });
   }
 };
+
 
