@@ -1,7 +1,9 @@
-import fs from "fs";
-import path from "path";
+// emotion_test/api/check-code.js
 
-export default function handler(req, res) {
+const fs = require("fs");
+const path = require("path");
+
+module.exports = (req, res) => {
   const { code } = req.query;
 
   if (!code) {
@@ -11,10 +13,10 @@ export default function handler(req, res) {
     });
   }
 
-  // 统一成大写、去掉前后空格，防止用户输小写或多输空格
+  // 规范一下用户输入：去空格、转大写
   const inputCode = String(code).trim().toUpperCase();
 
-  // 读取 data/codes.json
+  // 读取 data/codes.json 里的白名单
   const filePath = path.join(process.cwd(), "data", "codes.json");
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const data = JSON.parse(fileContent);
@@ -29,11 +31,9 @@ export default function handler(req, res) {
     });
   }
 
-  // 简单版：只校验“是否存在”，不记录已使用
-  // 后面如果你想做“防重复使用”，我们再接数据库来做
-
+  // 简单版：只判断“在不在这批码里”，不做“已使用”判断
   return res.status(200).json({
     ok: true,
-    message: "兑换成功",
+    message: "验证通过",
   });
-}
+};
