@@ -1,60 +1,136 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>结果 - 情绪安稳度测评</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <!-- 你现在在用的 CDN 保持不变 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
-<body>
-  <main id="report-root" class="report-stack">
-    <div class="card score-card full-width">
-      <div class="score-header">
-        <div>
-          <h2 class="section-title">情绪安稳指数</h2>
-          <div class="score-badge"><span id="stable-index">0</span><small>/ 100</small></div>
-          <div class="type-pill" id="emotion-type">类型</div>
-          <p class="meta-line" id="short-summary"></p>
+<body data-page="result">
+  <main class="report-main">
+    <!-- 这个容器会被保存成图片，ID 一定要保留 -->
+    <div id="report-card" class="report-shell">
+
+      <!-- 顶部：指数 + 类型 + 保存按钮 -->
+      <section class="report-card report-hero">
+        <div class="report-hero-main">
+          <div class="report-hero-label-row">
+            <span class="icon-chip">🌿</span>
+            <span class="hero-chip-text">情绪安稳指数</span>
+          </div>
+          <div class="score-row">
+            <div class="score-number-wrap">
+              <span id="score-number" class="score-number">0</span>
+              <span class="score-slash">/ 100</span>
+            </div>
+            <span id="type-label" class="score-type-pill">类型</span>
+          </div>
+          <p id="emotion-portrait" class="hero-summary">
+            你的情绪安稳画像会显示在这里。
+          </p>
         </div>
-        <div class="save-area">
-          <button id="save-report-btn" class="btn-primary">保存完整报告为图片</button>
-          <p class="meta-line">保存后可留存给自己或与信任的人分享。</p>
+
+        <div class="report-hero-side">
+          <button id="save-report" class="btn primary full">
+            保存完整报告为图片
+          </button>
+          <p class="hero-side-tip">保存后可以留存给自己，或与信任的人轻声分享。</p>
         </div>
-      </div>
+      </section>
+
+      <!-- 雷达图 + 维度列表 -->
+      <section class="report-card">
+        <div class="section-header">
+          <span class="section-icon">✨</span>
+          <h2 class="section-title">情绪四维雷达</h2>
+        </div>
+
+        <div class="radar-wrapper">
+          <canvas id="radar-chart" height="260"></canvas>
+        </div>
+
+        <ul id="dimension-list" class="dimension-list">
+          <!-- JS 会自动填充维度和分数 -->
+        </ul>
+      </section>
+
+      <!-- ① 你的情绪画像（文字会由 JS 写入 emotion-portrait） -->
+      <section class="report-card">
+        <div class="section-header">
+          <span class="section-icon">🍃</span>
+          <h2 class="section-title">① 你的情绪画像</h2>
+        </div>
+        <p id="emotion-portrait" class="section-text">
+          情绪画像加载中…
+        </p>
+      </section>
+
+      <!-- ② 最近可能出现的小信号 -->
+      <section class="report-card">
+        <div class="section-header">
+          <span class="section-icon">🍋</span>
+          <h2 class="section-title">② 你最近可能出现的小信号</h2>
+        </div>
+        <p id="small-signals" class="section-text">
+          小信号加载中…
+        </p>
+      </section>
+
+      <!-- ③ 你的隐藏优点 -->
+      <section class="report-card">
+        <div class="section-header">
+          <span class="section-icon">🌙</span>
+          <h2 class="section-title">③ 你的隐藏优点</h2>
+        </div>
+        <p id="hidden-strengths" class="section-text">
+          隐藏优点加载中…
+        </p>
+      </section>
+
+      <!-- ④ 给现在的你 3 个温柔建议 -->
+      <section class="report-card">
+        <div class="section-header">
+          <span class="section-icon">⭐</span>
+          <h2 class="section-title">④ 给现在的你 3 个温柔建议</h2>
+        </div>
+        <p id="suggestions" class="section-text">
+          建议加载中…
+        </p>
+      </section>
+
+      <!-- ⑤ 属于你的治愈金句 -->
+      <section class="report-card">
+        <div class="section-header">
+          <span class="section-icon">💌</span>
+          <h2 class="section-title">⑤ 属于你的治愈金句</h2>
+        </div>
+        <div class="quote-card">
+          <p id="golden-line" class="quote-text">
+            治愈金句加载中…
+          </p>
+        </div>
+      </section>
+
+      <!-- 免责声明 -->
+      <section class="report-card disclaimer-card">
+        <h3 class="disclaimer-title">免责声明</h3>
+        <p>
+          本测评仅用于轻量情绪体验参考，不构成任何专业心理评估、诊断或治疗建议。
+        </p>
+        <p>
+          如你正在经历持续性的情绪困扰、严重压力或明显影响日常生活的情绪波动，请及时寻求专业心理咨询师或医生的帮助。
+        </p>
+      </section>
     </div>
 
-    <div class="card radar-card full-width">
-      <h3 class="section-title">情绪四维雷达</h3>
-      <canvas id="emotion-radar" height="360"></canvas>
-    </div>
-
-    <div class="card full-width">
-      <h3 class="section-title">① 你的情绪画像</h3>
-      <div id="profile-html"></div>
-    </div>
-
-    <div class="card full-width">
-      <h3 class="section-title">② 给现在的你 3 个温柔建议</h3>
-      <ul id="gentle-suggestions" class="list-soft"></ul>
-    </div>
-
-    <div class="card full-width">
-      <h3 class="section-title">③ 属于你的治愈金句</h3>
-      <div id="healing-quote-block">
-        <p id="quote-line-1"></p>
-        <p id="quote-line-2"></p>
-        <p id="quote-line-3"></p>
-      </div>
-    </div>
-
-    <div class="disclaimer full-width">
-      <h4 class="disclaimer-title">免责声明</h4>
-      <p>本测评仅用于轻量情绪体验参考，不构成任何专业心理评估、诊断或治疗建议。</p>
-      <p>如你正在经历持续性的情绪困扰、严重压力或明显影响日常生活的情绪波动，请及时寻求专业心理咨询师或医生的帮助。</p>
-    </div>
+    <!-- 底部消息（与 JS 中 result-message 对应） -->
+    <p id="result-message" class="result-message"></p>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
+
