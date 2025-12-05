@@ -3,7 +3,7 @@
 ========================================================= */
 async function loadCodes() {
   try {
-    const res = await fetch("/emotion_test/codes.json", {
+    const res = await fetch("/codes.json", {
       headers: { "Cache-Control": "no-cache" }
     });
 
@@ -182,3 +182,4 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
