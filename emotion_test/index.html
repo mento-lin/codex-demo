@@ -1,45 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>情绪安稳度测评｜治愈风</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>情绪安稳度测评｜兑换入口</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <main>
-    <header class="hero">
-      <div class="grid">
-        <h1 class="hero-title">情绪安稳度测评</h1>
-        <p class="hero-subtitle">用 30 个温柔小问题，陪你看看情绪的呼吸节奏。全程治愈绿风格，结果仅用于自我观察。</p>
-        <div class="redeem-box">
-          <label for="redeemInput" class="meta-line">请输入兑换码开启专属测评</label>
-          <div class="redeem-row">
-            <input id="redeemInput" type="text" placeholder="请输入兑换码" aria-label="兑换码" />
-            <button id="redeemBtn" class="btn-primary">开始测评</button>
-          </div>
-          <p id="redeemMessage" class="redeem-message" aria-live="polite"></p>
+<body data-page="redeem">
+  <main class="home-main">
+    <section class="home-shell">
+      <!-- 顶部品牌区 -->
+      <header class="home-header">
+        <p class="home-badge">情绪安稳度测评</p>
+        <h1 class="home-title">输入兑换码，开启 30 题治愈测评</h1>
+        <p class="home-subtitle">
+          用 30 个温柔小问题，看看最近的情绪呼吸节奏。结果仅用于自我观察，不做任何诊断。
+        </p>
+      </header>
+
+      <!-- 兑换表单区 -->
+      <section class="home-card">
+        <h2 class="home-card-title">兑换入口</h2>
+        <p class="home-card-meta">已购用户输入兑换码即可开始测评，进度会自动保存。</p>
+
+        <div class="form-area" role="form" aria-label="兑换码表单">
+          <label class="label" for="redeem-code">兑换码</label>
+          <input
+            id="redeem-code"
+            type="text"
+            placeholder="请输入兑换码"
+            autocomplete="one-time-code"
+          />
+
+          <label class="label" for="order-id">可选：记录标识</label>
+          <input
+            id="order-id"
+            type="text"
+            placeholder="比如昵称、订单号，便于你自己记忆（可不填）"
+          />
+
+          <button id="redeem-submit" class="btn primary">开始测评</button>
+
+          <p id="redeem-message" class="status" aria-live="polite"></p>
         </div>
-        <div class="grid" style="gap: 10px;">
-          <div class="type-pill">温柔陪伴 · 非诊断</div>
-        </div>
-      </div>
-      <div class="card" style="background:#f4fbf7;">
-        <h3 class="section-title">标题区域</h3>
-        <p class="meta-line">30 题 | 约 3-5 分钟 | 自动保存进度</p>
-        <ul class="feature-list">
-          <li>每道题都是温柔正向描述，点击即跳下一题。</li>
-          <li>完整答完才能查看报告，保护你的节奏与期待。</li>
-          <li>结果页包含安稳指数、情绪类型、雷达图与治愈金句。</li>
+
+        <ul class="home-tips">
+          <li>每个兑换码仅可使用一次。</li>
+          <li>测评过程中可随时退出，重新进入会恢复上次进度。</li>
+          <li>结果页支持一键保存为图片，方便留存或与信任的人分享。</li>
         </ul>
-        <div id="healing-quote-block" style="margin-top:16px;">
-          <p>愿你在这份测评里，轻轻看见自己的起伏。</p>
-          <p>情绪像潮汐，而你拥有岸。</p>
-          <p>慢慢来，也是一种温柔力量。</p>
-        </div>
-      </div>
-    </header>
+      </section>
+
+      <!-- 底部轻提示 -->
+      <section class="home-footer">
+        <p>本工具仅做轻量情绪自我观察，不构成任何专业心理评估或治疗建议。</p>
+      </section>
+    </section>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
+
