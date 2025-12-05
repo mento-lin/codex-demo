@@ -1,35 +1,45 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>情绪安稳度测评｜兑换入口</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>情绪安稳度测评｜治愈风</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body data-page="redeem">
-  <main class="page">
-    <section class="card hero-card">
-      <div class="hero-copy">
-        <p class="eyebrow">情绪安稳度测评</p>
-        <h1 class="title">输入兑换码，开启 30 题治愈绿测评</h1>
-        <p class="subtitle">输入兑换码即可开始测评，结果自动保存，无需飞书。</p>
+<body>
+  <main>
+    <header class="hero">
+      <div class="grid">
+        <h1 class="hero-title">情绪安稳度测评</h1>
+        <p class="hero-subtitle">用 30 个温柔小问题，陪你看看情绪的呼吸节奏。全程治愈绿风格，结果仅用于自我观察。</p>
+        <div class="redeem-box">
+          <label for="redeemInput" class="meta-line">请输入兑换码开启专属测评</label>
+          <div class="redeem-row">
+            <input id="redeemInput" type="text" placeholder="请输入兑换码" aria-label="兑换码" />
+            <button id="redeemBtn" class="btn-primary">开始测评</button>
+          </div>
+          <p id="redeemMessage" class="redeem-message" aria-live="polite"></p>
+        </div>
+        <div class="grid" style="gap: 10px;">
+          <div class="type-pill">温柔陪伴 · 非诊断</div>
+        </div>
       </div>
-
-      <div class="form-area" role="form">
-        <label class="label" for="redeem-code">兑换码</label>
-        <input id="redeem-code" type="text" placeholder="请输入兑换码" />
-
-        <label class="label" for="order-id">可选：记录标识</label>
-        <input id="order-id" type="text" placeholder="可不填" />
-
-        <button id="redeem-submit" class="btn primary">开始测评</button>
-
-        <p id="redeem-message" class="status"></p>
+      <div class="card" style="background:#f4fbf7;">
+        <h3 class="section-title">标题区域</h3>
+        <p class="meta-line">30 题 | 约 3-5 分钟 | 自动保存进度</p>
+        <ul class="feature-list">
+          <li>每道题都是温柔正向描述，点击即跳下一题。</li>
+          <li>完整答完才能查看报告，保护你的节奏与期待。</li>
+          <li>结果页包含安稳指数、情绪类型、雷达图与治愈金句。</li>
+        </ul>
+        <div id="healing-quote-block" style="margin-top:16px;">
+          <p>愿你在这份测评里，轻轻看见自己的起伏。</p>
+          <p>情绪像潮汐，而你拥有岸。</p>
+          <p>慢慢来，也是一种温柔力量。</p>
+        </div>
       </div>
-    </section>
+    </header>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>
-
