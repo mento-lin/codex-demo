@@ -36,22 +36,12 @@
     </div>
 
     <div class="card full-width">
-      <h3 class="section-title">② 你最近可能出现的小信号</h3>
-      <ul id="small-signals" class="list-soft"></ul>
-    </div>
-
-    <div class="card full-width">
-      <h3 class="section-title">③ 你的隐藏优点</h3>
-      <div id="hidden-strengths"></div>
-    </div>
-
-    <div class="card full-width">
-      <h3 class="section-title">④ 给现在的你 3 个温柔建议</h3>
+      <h3 class="section-title">② 给现在的你 3 个温柔建议</h3>
       <ul id="gentle-suggestions" class="list-soft"></ul>
     </div>
 
     <div class="card full-width">
-      <h3 class="section-title">⑤ 属于你的治愈金句</h3>
+      <h3 class="section-title">③ 属于你的治愈金句</h3>
       <div id="healing-quote-block">
         <p id="quote-line-1"></p>
         <p id="quote-line-2"></p>
@@ -64,79 +54,6 @@
       <p>本测评仅用于轻量情绪体验参考，不构成任何专业心理评估、诊断或治疗建议。</p>
       <p>如你正在经历持续性的情绪困扰、严重压力或明显影响日常生活的情绪波动，请及时寻求专业心理咨询师或医生的帮助。</p>
     </div>
-  </main>
-  <script src="script.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>情绪安稳度测评｜结果</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-</head>
-<body data-page="result">
-  <main class="page">
-    <section class="card result-card" id="report-card">
-      <div class="result-header">
-        <div>
-          <p class="eyebrow">情绪安稳度测评</p>
-          <h1 class="title small">治愈绿雷达分析</h1>
-          <p class="subtitle">安稳指数、情绪类型、四维雷达图与温柔建议。</p>
-        </div>
-        <div class="score-block">
-          <p class="score-label">安稳指数</p>
-          <p id="score-number" class="score-number">--</p>
-          <p id="type-label" class="type-chip">--</p>
-        </div>
-      </div>
-
-      <div class="grid two">
-        <div class="panel">
-          <h2 class="panel-title">四维雷达图</h2>
-          <canvas id="radar-chart" width="400" height="400" aria-label="情绪维度雷达图"></canvas>
-        </div>
-        <div class="panel">
-          <h2 class="panel-title">维度得分</h2>
-          <ul class="dimension-list" id="dimension-list"></ul>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2 class="panel-title">情绪画像</h2>
-        <p id="emotion-portrait" class="panel-text"></p>
-      </div>
-
-      <div class="grid two">
-        <div class="panel">
-          <h2 class="panel-title">小信号</h2>
-          <p id="small-signals" class="panel-text"></p>
-        </div>
-        <div class="panel">
-          <h2 class="panel-title">隐藏优点</h2>
-          <p id="hidden-strengths" class="panel-text"></p>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2 class="panel-title">温柔建议</h2>
-        <p id="suggestions" class="panel-text"></p>
-      </div>
-
-      <div class="panel quote-panel">
-        <h2 class="panel-title">安慰金句</h2>
-        <p id="golden-line" class="quote"></p>
-      </div>
-
-      <div class="actions">
-        <button id="save-report" class="btn secondary">保存报告为图片</button>
-        <a class="btn link" href="index.html">返回首页</a>
-      </div>
-      <p id="result-message" class="status"></p>
-    </section>
   </main>
   <script src="script.js"></script>
 </body>
