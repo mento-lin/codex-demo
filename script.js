@@ -1,13 +1,7 @@
-/******************************
- * 情绪安稳度测评 - 静态版（带兑换码）
- * - 不依赖飞书、不依赖 Netlify 函数
- * - 兑换码从根目录 codes.json 读取
- * - 题目 & 结果逻辑 = 你第一版的内容
- ******************************/
+// =====================
+// 题目 & 配置
+// =====================
 
-// =====================
-// 题库（30 题）
-// =====================
 const QUESTIONS = [
   { id: 1, text: "我能觉察到情绪的起伏，并尝试温柔地安放它们。", dimension: "emotion_fluctuation" },
   { id: 2, text: "遇到压力时，我会给自己留出喘息的空间再继续。", dimension: "stress_tolerance" },
@@ -27,7 +21,7 @@ const QUESTIONS = [
   { id: 16, text: "当情绪受伤时，我会做一些让自己慢慢被治愈的事情。", dimension: "self_repair" },
   { id: 17, text: "我能温柔接受自己的敏感，并让它成为一种觉察力。", dimension: "emotion_fluctuation" },
   { id: 18, text: "压力大的时候，我会用小休息或深呼吸来温柔地稳住自己。", dimension: "stress_tolerance" },
-  { id: 19, text: "在人际中，如果感到不适，我能礼貌表达并调整。", dimension: "interpersonal_sensitivity" },
+  { id: 19, text: "在社交中，如果感到不适，我能礼貌表达并调整。", dimension: "interpersonal_sensitivity" },
   { id: 20, text: "我相信自己有能力从困境中一点点修复。", dimension: "self_repair" },
   { id: 21, text: "我能分辨情绪的不同层次，并允许它们存在。", dimension: "emotion_fluctuation" },
   { id: 22, text: "遇到紧迫任务时，我会拆解步骤而不是陷入焦虑。", dimension: "stress_tolerance" },
@@ -43,34 +37,31 @@ const QUESTIONS = [
 
 const OPTION_TEXTS = ["非常不符合", "有点不符合", "一般般", "比较符合", "非常符合"];
 
-// =====================
-// 结果画像 & 文案（第一版）
-// =====================
 const EMOTION_PROFILES = {
   A: {
-    typeName: "柔韧自持型",
-    summary: "你能很好照顾自己的节奏，在压力中保持从容和稳度。",
+    typeName: "稳定型",
+    summary: "你的情绪像一汪平稳的水，柔软而有力量，能温柔接住日常的起伏。",
     profileHtml: (scores, esi) => `
-      <p>你的情绪安稳指数为 ${esi}。整体来看，情绪波动觉察 ${scores.emotion_fluctuation}，说明你能看见细微的起伏并愿意陪伴；压力承受 ${scores.stress_tolerance}，让你在忙碌中仍能找到调节节奏的小口子；人际敏感度 ${scores.interpersonal_sensitivity}，支持你在关系里细腻感知善意与距离；自我修复力 ${scores.self_repair}，帮助你在消耗之后慢慢补能。</p>
-      <p>这种自持与柔软的平衡，会让你在不同场景里保持从容。</p>
+      <p>你的情绪安稳指数为 ${esi}。情绪波动觉察 ${scores.emotion_fluctuation}，说明你能细致观察并陪伴自己的心绪；压力承受 ${scores.stress_tolerance}，让你在忙碌中仍保留呼吸感；人际敏感度 ${scores.interpersonal_sensitivity}，帮助你温柔回应他人；自我修复力 ${scores.self_repair}，支持你在消耗后慢慢补能。</p>
+      <p>这份稳定与敏感并存的能量，让你能以柔韧的姿态照顾自己，也给身边人带来安心。</p>
     `,
     healingQuotes: [
-      "不必一次完成所有改变，小步也能抵达。",
-      "当你看见自己的努力，温柔就留在心里。",
-      "允许自己偶尔靠岸，才能带着能量再出发。"
+      "你的温柔，也是力量。",
+      "情绪有潮汐，而你有岸。",
+      "慢慢来，心会把答案送到你手心。"
     ],
     gentleSuggestions: [
-      "保持规律作息与简单饮食，让身体成为稳稳的底座。",
-      "压力多时，先写下三件做得好的小行动，慢慢推进。",
-      "每天给自己一段独处的时间，听音乐、写字或做深呼吸。"
+      "保持充足睡眠与清淡饮食，让身体支撑这份稳定。",
+      "每天 5 分钟呼吸或冥想，像打磨一面柔软的盾牌。",
+      "散步、晒太阳或触摸植物，让自然继续滋养你的韧性。"
     ]
   },
   B: {
     typeName: "轻波动型",
-    summary: "你大多时候是平稳的，只是偶尔起伏，需要一点节奏照顾就能回到舒适。",
+    summary: "你大多时候平稳，只是偶尔起伏，需要一点节奏照顾就能回到舒适。",
     profileHtml: (scores, esi) => `
-      <p>你的情绪安稳指数为 ${esi}。情绪波动觉察 ${scores.emotion_fluctuation}，说明你能注意到内心的小波澜；压力承受 ${scores.stress_tolerance}，提醒你在忙碌时记得小憩；人际敏感度 ${scores.interpersonal_sensitivity}，让你在互动中更懂得照顾彼此感受；自我修复力 ${scores.self_repair}，支持你在疲惫后慢慢恢复。</p>
-      <p>当你愿意为自己保留喘息空间，稳定感会更常驻。</p>
+      <p>你的情绪安稳指数为 ${esi}。情绪波动觉察 ${scores.emotion_fluctuation}，你能察觉细微变化；压力承受 ${scores.stress_tolerance}，提示你在忙碌时记得小憩；人际敏感度 ${scores.interpersonal_sensitivity}，让你温柔感知关系中的细节；自我修复力 ${scores.self_repair}，帮助你在波动后恢复。</p>
+      <p>当你愿意放慢脚步、补充能量，稳定感会更常驻。</p>
     `,
     healingQuotes: [
       "情绪有潮汐，停一停也很好。",
@@ -78,8 +69,8 @@ const EMOTION_PROFILES = {
       "小小的照顾，也能让能量慢慢回到身体。"
     ],
     gentleSuggestions: [
-      "保证 7–8 小时睡眠，少量多次补水，保持轻盈感。",
-      "心绪起伏时试试 4–7–8 呼吸法，或写下当下的想法。",
+      "保证 7-8 小时睡眠，少量多次补水，保持轻盈感。",
+      "心绪起伏时试试 4-7-8 呼吸或写下当下想法。",
       "安排短暂散步或拉伸，让身体带动情绪舒展。"
     ]
   },
@@ -92,20 +83,25 @@ const EMOTION_PROFILES = {
     `,
     healingQuotes: [
       "你可以慢一点，没有关系。",
-      "在被理解之前，也要先理解自己。",
+      "被理解之前，也要先理解自己。",
       "你值得被温柔以待。"
     ],
     gentleSuggestions: [
-      "睡前减少刷屏，用温水泡脚或拉伸，帮身体先放松下来。",
-      "紧绷时试着把手放在心口，做 5 分钟缓慢呼吸，告诉自己“我在陪着你”。",
-      "感到压抑时，去阳台或楼下走走，看看绿植、感受风和阳光。"
+      "保持规律作息，睡前少刷屏，用温水泡脚帮助放松。",
+      "紧绷时捂住心口或做 5 分钟呼吸，让身体先安定。",
+      "去阳台或公园走走，看看绿植、感受风与阳光。"
     ]
   }
 };
 
+let currentQuestionIndex = 0;
+let selectedOption = null;
+let isSubmitting = false;
+
 // =====================
-// 工具函数：标题加 emoji
+// 通用小工具
 // =====================
+
 function addEmojisToTitles() {
   const emojis = ["🌿", "✨", "🍃", "🌙"];
   document.querySelectorAll(".section-title").forEach((title, index) => {
@@ -118,9 +114,6 @@ function addEmojisToTitles() {
   });
 }
 
-// =====================
-// 本地存储答题
-// =====================
 function getStoredAnswers() {
   const stored = localStorage.getItem("emotionTestAnswers");
   if (stored) {
@@ -140,54 +133,33 @@ function saveAnswers(answers) {
   localStorage.setItem("emotionTestAnswers", JSON.stringify(answers));
 }
 
-// =====================
-// 加载兑换码列表（从 codes.json）
-// =====================
-let __codesCache = null;
-
-async function loadCodes() {
-  if (__codesCache) return __codesCache;
-  const res = await fetch("codes.json", { cache: "no-cache" });
-  if (!res.ok) {
-    throw new Error("兑换码列表加载失败");
-  }
-  const data = await res.json();
-  __codesCache = Array.isArray(data.codes) ? data.codes : [];
-  return __codesCache;
-}
-
-// 记录本设备已经用过的兑换码（防重复）
-function markCodeUsedLocally(code) {
-  const raw = localStorage.getItem("usedCodes") || "[]";
-  let arr;
-  try {
-    arr = JSON.parse(raw);
-  } catch {
-    arr = [];
-  }
-  if (!arr.includes(code)) {
-    arr.push(code);
-    localStorage.setItem("usedCodes", JSON.stringify(arr));
-  }
-}
-
-function isCodeUsedLocally(code) {
-  const raw = localStorage.getItem("usedCodes") || "[]";
-  try {
-    const arr = JSON.parse(raw);
-    return arr.includes(code);
-  } catch {
+function ensureRedeemAccess() {
+  const code =
+    localStorage.getItem("redeem_code") || localStorage.getItem("redeemCode");
+  if (!code) {
+    window.location.href = "index.html?needCode=1";
     return false;
   }
+  return true;
+}
+
+function clearActiveOptions(optionsEl) {
+  if (!optionsEl) return;
+  optionsEl.querySelectorAll(".option-btn").forEach((btn) =>
+    btn.classList.remove("active")
+  );
 }
 
 // =====================
-// 首页：兑换逻辑（index.html）
+// 首页：兑换码入口（简化版）
 // =====================
+
 function setupHomePage() {
   const startBtn = document.getElementById("redeemBtn");
   const redeemInput = document.getElementById("redeemInput");
   const redeemMessage = document.getElementById("redeemMessage");
+
+  // 如果页面本身没有这个按钮（说明不是首页），直接返回
   if (!startBtn || !redeemInput) return;
 
   const params = new URLSearchParams(window.location.search);
@@ -195,7 +167,7 @@ function setupHomePage() {
     redeemMessage.textContent = "请先输入兑换码，再开始测评～";
   }
 
-  startBtn.addEventListener("click", async () => {
+  startBtn.addEventListener("click", () => {
     const rawCode = redeemInput.value || "";
     const code = rawCode.trim().toUpperCase();
 
@@ -207,74 +179,24 @@ function setupHomePage() {
       return;
     }
 
+    // 纯前端版：不再真正校验，只要有内容就让 TA 进入
+    localStorage.setItem("redeemCode", code);
+    localStorage.setItem("redeem_code", code);
+
     if (redeemMessage) {
-      redeemMessage.textContent = "正在校验兑换码，请稍候…";
-      redeemMessage.style.color = "#5f6f65";
+      redeemMessage.textContent = "兑换码已记录，马上为你开启测评～";
+      redeemMessage.style.color = "#3c7a4f";
     }
 
-    try {
-      const list = await loadCodes();
-      const found = list.find((item) => (item.code || "").toUpperCase() === code);
-
-      if (!found) {
-        if (redeemMessage) {
-          redeemMessage.textContent = "兑换码不存在或已失效，请核对后再试～";
-          redeemMessage.style.color = "#c0392b";
-        }
-        return;
-      }
-
-      if (isCodeUsedLocally(code)) {
-        if (redeemMessage) {
-          redeemMessage.textContent = "这个兑换码已经在本设备使用过啦～";
-          redeemMessage.style.color = "#c0392b";
-        }
-        return;
-      }
-
-      // 通过校验，写入本地 & 进入答题页
-      localStorage.setItem("redeem_code", code);
-      localStorage.setItem("redeemCode", code);
-      localStorage.removeItem("emotionTestAnswers"); // 清理旧答案
-      markCodeUsedLocally(code);
-
-      if (redeemMessage) {
-        redeemMessage.textContent = "兑换成功，正在为你开启测评…";
-        redeemMessage.style.color = "#2e7d32";
-      }
-
-      setTimeout(() => {
-        window.location.href = "test.html";
-      }, 500);
-    } catch (error) {
-      console.error(error);
-      if (redeemMessage) {
-        redeemMessage.textContent = "网络有点小波动，请稍后再试～";
-        redeemMessage.style.color = "#c0392b";
-      }
-    }
+    setTimeout(() => {
+      window.location.href = `test.html?code=${encodeURIComponent(code)}`;
+    }, 300);
   });
 }
 
 // =====================
-// 答题页：权限 + 渲染题目
+// 答题页逻辑
 // =====================
-function ensureRedeemAccess() {
-  const code = localStorage.getItem("redeem_code") || localStorage.getItem("redeemCode");
-  if (!code) {
-    window.location.href = "index.html?needCode=1";
-    return false;
-  }
-  return true;
-}
-
-let currentQuestionIndex = 0;
-let selectedOption = null;
-
-function clearActiveOptions(optionsEl) {
-  if (!optionsEl) return;
-  optionsEl.querySelectorAll(".option-btn").forEach((btn) => btn.classList.remove("active"));
-}
 
 function renderQuestion(index, answers) {
   currentQuestionIndex = index;
@@ -288,7 +210,8 @@ function renderQuestion(index, answers) {
   const optionsEl = document.getElementById("options");
 
   const current = QUESTIONS[index];
-  if (questionNumberEl) questionNumberEl.textContent = `第 ${index + 1} 题 / 共 ${totalQuestions} 题`;
+  if (questionNumberEl)
+    questionNumberEl.textContent = `第 ${index + 1} 题 / 共 ${totalQuestions} 题`;
   if (questionTextEl) questionTextEl.textContent = current.text;
 
   const completedCount = answers.filter((v) => v !== null).length;
@@ -333,37 +256,34 @@ function updateProgress(answers) {
     const match = text.match(/第 (\d+) 题/);
     if (match) {
       const currentIndex = Number(match[1]) - 1;
-      questionNumberEl.textContent = `第 ${currentIndex + 1} 题 / 共 ${totalQuestions} 题`;
+      questionNumberEl.textContent = `第 ${
+        currentIndex + 1
+      } 题 / 共 ${totalQuestions} 题`;
     }
   }
 }
 
-let isSubmitting = false;
-
 function handleOptionSelect(index, value, answers, buttonEl) {
-  const errorEl = document.getElementById("error-message");
-  if (errorEl) errorEl.textContent = "";
-
+  selectedOption = value;
   const wasNull = answers[index] === null;
   answers[index] = value;
   saveAnswers(answers);
 
   const optionsEl = document.getElementById("options");
   clearActiveOptions(optionsEl);
-  if (buttonEl) buttonEl.classList.add("active");
+  if (buttonEl) {
+    buttonEl.classList.add("active");
+  }
 
   updateProgress(answers);
 
   const nextIndex = index + 1 < QUESTIONS.length ? index + 1 : index;
   if (nextIndex !== index) {
-    setTimeout(() => renderQuestion(nextIndex, answers), 700);
+    setTimeout(() => renderQuestion(nextIndex, answers), 600);
   } else {
-    // 最后一题，直接跳结果
-    if (isSubmitting) return;
-    isSubmitting = true;
     setTimeout(() => {
-      window.location.href = "result.html";
-    }, 500);
+      submitFinalAnswers(answers);
+    }, 600);
   }
 }
 
@@ -395,8 +315,9 @@ function setupTestPage() {
 }
 
 // =====================
-// 结果计算 & 渲染
+// 计算结果 & 本地存储
 // =====================
+
 function calculateResults() {
   const answers = getStoredAnswers();
   const completedCount = answers.filter((v) => v !== null).length;
@@ -439,6 +360,24 @@ function calculateResults() {
 
   return { answers, totalScore, stableIndex, dimensionScores, type };
 }
+
+// 纯前端版提交：不再调用任何接口，仅本地算完跳结果页
+async function submitFinalAnswers(answers) {
+  const errorEl = document.getElementById("error-message");
+  if (errorEl) errorEl.textContent = "";
+
+  const allDone = answers.every((item) => item !== null);
+  if (!allDone || isSubmitting) return;
+
+  isSubmitting = true;
+  calculateResults();
+  window.location.href = "result.html";
+  isSubmitting = false;
+}
+
+// =====================
+// 结果页渲染
+// =====================
 
 function buildPortraitText(profile, scores, stableIndex) {
   return profile.profileHtml(scores, stableIndex);
@@ -492,13 +431,16 @@ function renderRadar(dimensionScores) {
             color: "#4a5b52",
             font: { size: 11 }
           },
-          grid: { color: "rgba(92, 156, 133, 0.2)" },
-          angleLines: { color: "rgba(92, 156, 133, 0.25)" },
+          grid: {
+            color: "rgba(92, 156, 133, 0.2)"
+          },
+          angleLines: {
+            color: "rgba(92, 156, 133, 0.25)"
+          },
           pointLabels: {
             color: "#2e3d33",
             font: { size: 12 },
-            padding: 8,
-            callback: (v) => v
+            padding: 8
           }
         }
       },
@@ -514,6 +456,8 @@ function renderResultPage() {
   const stableIndexEl = document.getElementById("stable-index");
   if (!stableIndexEl) return;
 
+  if (!ensureRedeemAccess()) return;
+
   const result = calculateResults();
   if (!result) return;
 
@@ -524,13 +468,17 @@ function renderResultPage() {
   const shortSummaryEl = document.getElementById("short-summary");
 
   stableIndexEl.textContent = `${stableIndex}`;
-  if (emotionTypeEl) emotionTypeEl.textContent = `${type} ｜ ${profile.typeName}`;
+  if (emotionTypeEl)
+    emotionTypeEl.textContent = `${type} ｜ ${profile.typeName}`;
   if (shortSummaryEl) shortSummaryEl.textContent = profile.summary;
 
   const portraitEl = document.getElementById("profile-html");
-  if (portraitEl) {
-    portraitEl.innerHTML = buildPortraitText(profile, dimensionScores, stableIndex);
-  }
+  if (portraitEl)
+    portraitEl.innerHTML = buildPortraitText(
+      profile,
+      dimensionScores,
+      stableIndex
+    );
 
   const suggestionsEl = document.getElementById("gentle-suggestions");
   if (suggestionsEl) {
@@ -545,10 +493,9 @@ function renderResultPage() {
   const line1 = document.getElementById("quote-line-1");
   const line2 = document.getElementById("quote-line-2");
   const line3 = document.getElementById("quote-line-3");
-  const [q1, q2, q3] = profile.healingQuotes;
-  if (line1) line1.textContent = `🌿 ${q1}`;
-  if (line2) line2.textContent = `🌿 ${q2}`;
-  if (line3) line3.textContent = `🌿 ${q3}`;
+  if (line1) line1.textContent = `🌿 ${profile.healingQuotes[0]}`;
+  if (line2) line2.textContent = `🌿 ${profile.healingQuotes[1]}`;
+  if (line3) line3.textContent = `🌿 ${profile.healingQuotes[2]}`;
 
   renderRadar(dimensionScores);
   addEmojisToTitles();
@@ -558,21 +505,24 @@ function renderResultPage() {
     saveBtn.addEventListener("click", () => {
       const target = document.getElementById("report-root");
       if (!target) return;
-      html2canvas(target, { scale: 2, useCORS: true, backgroundColor: null }).then(
-        (canvas) => {
-          const link = document.createElement("a");
-          link.download = "emotion-report.png";
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-        }
-      );
+      html2canvas(target, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null
+      }).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "emotion-report.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
     });
   }
 }
 
 // =====================
-// 全局初始化
+// 页面初始化
 // =====================
+
 function init() {
   addEmojisToTitles();
   setupHomePage();
@@ -581,3 +531,4 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
